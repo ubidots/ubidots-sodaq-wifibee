@@ -18,62 +18,56 @@
 */
 
 
-#ifndef __SODAQGPRSbee_H_
-#define __SODAQGPRSbee_H_
+#ifndef __SODAQWiFibee_H_
+#define __SODAQWiFibee_H_
 
 #include <stdint.h>
 #include <Arduino.h>
 #include <Stream.h>
+#include "WiFly.h"
 
+#define DEFAULT_BUFFER_SIZE      64
+#define MAX_VALUES 4
+
+#define WIFLY_AUTH_OPEN        0    // Open (default)  
+#define WIFLY_AUTH_WEP         1    // WEP-128
+#define WIFLY_AUTH_WPA1        2    // WPA1
+#define WIFLY_AUTH_WPA1_2      3    // Mixed-mode WPA1 and WPA2-PSK
+#define WIFLY_AUTH_WPA2_PSK    4    // WPA2-PSK
+#define WIFLY_AUTH_ADHOC       6    // Ad-hoc, join any Ad-hoc network
+
+#define BAUDRATE 9600
+#define TCP_CLIENT_DEFAULT_TIMEOUT         30000  // 3s
 
 #define SERVER "translate.ubidots.com"
-#define PORT "9010"
-#define MAX_VALUE 5
-#define USER_AGENT "SODAQGPRSbee/1.0"
-#define DEFAULT_BUFFER_SIZE      64
-
+#define PORT 9010
+#define MAX_VALUES 5
 
 
 typedef struct Value {
-  char  *varName;
-  char  *ctext;
-  float varValue;
+  char  *idName;
+  float valueName;
+  char *ctext;
 } Value;
 
 class Ubidots {
  public:
-	Ubidots(char* token=NULL);
-	bool setApn(char* apn, char* user, char* pwd);
-	float getValueWithDatasource(char* dsTag, char* idName);
-	void setDataSourceName(char* dsName);
-	void setDataSourceTag(char* dsTag);
-	bool sendAll();
-	void add(char *variableName, float value, char* context);
-	void setOnBee(int vcc33Pin, int onoffPin, int statusPin);
-	char* readData(uint16_t timeout);
-    void flushInput();
+    Ubidots(char* token);
+    bool sendAll();
+    bool wifiConnection(const char *ssid, const char *phrase, int auth = WIFLY_AUTH_OPEN);
+    float getValue(char* id);
+    void add(char *variable_id, float value);
+    void add(char *variable_id, float value, char* context);
+    bool setDatasourceName(char* dsName);
+    bool setDatasourceTag(char* dsTag);
 
- private:
-	void init(int vcc33Pin, int onoffPin, int statusPin);
-	void on();
-	void off();
-	bool isOn();
-	int readLine(uint32_t ts_max);
-	bool isTimedOut(uint32_t ts) { return (long)(millis() - ts) >= 0; }
-	bool waitForOK(uint16_t timeout=4000);
-	bool waitForMessage(const char *msg, uint32_t ts_max);
-	bool waitForMessage_P(const char *msg, uint32_t ts_max);
-	int waitForMessages(const char *msgs[], size_t nrMsgs, uint32_t ts_max);
-	bool waitForPrompt(const char *prompt, uint32_t ts_max);
-	char buffer[DEFAULT_BUFFER_SIZE];
-	int8_t _vcc33Pin;
-    int8_t _onoffPin;
-    int8_t _statusPin;
-
+ private:    
+    int currentValue;
+    float parseValue(String body);
+    Value * val;
+    WiFly _client = WiFly(&Serial1);
+    char* _token;
     char* _dsTag;
     char* _dsName;
-    char* _token;
-    uint8_t currentValue;
-    Value * val;    
 };
 #endif
