@@ -38,8 +38,8 @@ In the next example we explain how to send a Temperature value to Ubidots API fr
 */
 
 // To add space in RN171 you just put "$" instead of " "
-#define SSID "WIFI$SSID"  
-#define KEY "WiFi_Pass"
+#define SSID "SSID"  
+#define KEY "PASS"
 #define AUTH WIFLY_AUTH_WPA2_PSK
 #define TOKEN "asdasenas12321adaxxxxx"  // Replace it with your Ubidots token
 
