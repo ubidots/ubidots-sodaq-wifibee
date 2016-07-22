@@ -49,13 +49,9 @@ bool Ubidots::wifiConnection(const char *ssid, const char *phrase, int auth) {
         delay(100);
     }
 }
-/** 
- * This function is to get value from the Ubidots API
- * @arg id the id where you will get the data
- * @return num the data that you get from the Ubidots API
- */
+
 float Ubidots::parseValue(String body){
-  /*String rawvalue;
+  String rawvalue;
   float num;
   char reply[15];
   uint8_t bodyPosinit;
@@ -66,7 +62,7 @@ float Ubidots::parseValue(String body){
   bodyP.send = rawvalue.indexOf(", \"timestamp\"");
   rawvalue.substring(bodyPosinit,bodyP.send).toCharArray(reply, 10);
   num = atof(reply); 
-  return num;*/
+  return num;
 }
 /** 
  * This function is to get value from the Ubidots API
