@@ -19,42 +19,73 @@ This library is to connect easily an mDot with SODAQ Autonomo
 6. Select the .ZIP file of GPRSbee and then "Accept" or "Choose"
 5. Close the Arduino IDE and open it again.
 
+Note: 
+    * This library uses WiFly library of SeeedStudio. For this reason I added it to this repository.
+    * This library creates a new Ubidots data source named "SODAQWiFly", Inside that the library will save the variables.
     
 ## Send one value to Ubidots
 
-To send one value from mDot to your gateway copy the next code:
+In the next example we explain how to send a Temperature value to Ubidots API from your device. Please don't forget to change **SSID**, **KEY**, **AUTH** and **TOKEN**.
 
 ```cpp
-#include <GPRSbee.h>
+#include <SODAQWiFibee.h>
 
-// Put here your SSID of lora gateway
-#define APN "Your_Lora_Gateway_SSID"
-// Put here your PASS of lora gateway
-#define USER_APN "Your_Lora_Gateway_PASS"
-// Put here your frequenci sub-band of lora gateway
-#define PASS_APN "1"
+/* Change the AUTH according to your network settings
+   If is open change to WIFLY_AUTH_OPEN
+   If is WPA1 change to WIFLY_AUTH_WPA1
+   If is WPA1_2 change to WIFLY_AUTH_WPA1
+   If is WPA2 change to WIFLY_AUTH_WPA1
+*/
 
-Ubidots loraClient;
+// To add space in RN171 you just put "$" instead of " "
+#define SSID "SSID"  
+#define KEY "PASS"
+#define AUTH WIFLY_AUTH_WPA2_PSK
+#define TOKEN "asdasenas12321adaxxxxx"  // Replace it with your Ubidots token
 
+Ubidots client(TOKEN);
 
-void setup()
-{
-    // The code will not start unless the serial monitor is opened or 10 sec is passed
-    // incase you want to operate Autonomo with external power source
-    while ((!SerialUSB) && (millis() < 10000))
-        ;
-    
-    SerialUSB.begin(115200);
-    SerialUSB.println("Here we start !! ");
-
-    Serial1.begin(115200);
-    loraClient.setOnBee(BEE_VCC, BEEDTR, BEECTS);
-    while(!loraClient.loraConnection(GATEWAY_SSID, GATEWAY_PASS, GATEWAY_SUB_BAND));
+void setup() {
+    client.wifiConnection(SSID, KEY, AUTH);    
 }
 
 void loop() {
     float value = analogRead(A0);
-    loraClient.loraSend(value);
+    client.add("Tmeperature", value);
+    client.sendAll();
     delay(1000);
 }
 ```
+
+## Get one value from Ubidots
+
+In the next example we will explain you how to get the last value from a Ubidots variable. Please don't forget to change **SSID**, **KEY**, **AUTH** and **TOKEN**.
+
+```cpp
+#include <SODAQWiFibee.h>
+
+/* Change the AUTH according to your network settings
+   If is open change to WIFLY_AUTH_OPEN
+   If is WPA1 change to WIFLY_AUTH_WPA1
+   If is WPA1_2 change to WIFLY_AUTH_WPA1
+   If is WPA2 change to WIFLY_AUTH_WPA1
+*/
+
+// To add space in RN171 you just put "$" instead of " "
+#define SSID "WIFI$SSID"  
+#define KEY "WiFi_Pass"
+#define AUTH WIFLY_AUTH_WPA2_PSK
+#define TOKEN "asdasenas12321adaxxxxx"  // Replace it with your Ubidots token
+
+Ubidots client(TOKEN);
+
+void setup() {
+    client.wifiConnection(SSID, KEY, AUTH);    
+}
+
+void loop() {
+    float value = client.getValue(ID);
+    delay(1000);
+}
+```
+
